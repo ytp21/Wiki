@@ -60,9 +60,19 @@ def search(request):
     value = request.GET.get("search_input","")
     value_content = util.get_entry(value)
     if value_content is not None:
+        entries = util.list_entries()
+        for entry in entries:
+            result = re.match(value.upper(), entry.upper())
+            if result:
+                final_entry = entry
+                break
+            else:
+                pass
+
         return render(request, "encyclopedia/entrypage.html", {
-            "entrycontext": markdowner.convert(value_content),
-            "search": True
+            "header": markdowner.convert(f"# {final_entry}"),
+            "entrycontext": markdowner.convert(re.sub(f"^# {final_entry}","", value_content)),
+            "title": final_entry
             })
 
     elif value == "":
@@ -98,8 +108,7 @@ def newPage(request):
             full_content = f"# {title}\n\n{content}"
             if util.get_entry(title) is None:
                 util.save_entry(title, full_content)
-                url = '{}?{}&entry={}'.format('/', 'value=True', title)
-                return redirect(url)
+                return HttpResponseRedirect(reverse("entrypage", kwargs={"entryname": title}))
             else:
                 form = FormInput(initial={'title': title, 'content': content})
                 return render(request, "encyclopedia/newpage.html", {
