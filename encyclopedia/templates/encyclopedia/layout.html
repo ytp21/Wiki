@@ -1,38 +1,102 @@
 {% load static %}
-
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
-    <head>
+  <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
         <title>{% block title %}{% endblock %}</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link href="{% static 'encyclopedia/styles.css' %}" rel="stylesheet">
+        <link rel="icon" type="image/png" href="{% static 'encyclopedia/Wiki.png' %}">
+
+        <link href="{% static 'encyclopedia/bootstrap.css' %}" rel="stylesheet">
+
+        <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+            }
+        }
+        
+        .header-link {
+            text-decoration: none;
+            color: black;
+        }
+
+        .header-link:hover {
+            text-decoration: underline;
+            color: rgb(67, 67, 224);
+        }
+        
+        .select:hover {
+            transition-duration: 0.3s;
+            background-color: white;
+        }
+
+        </style>
+
+        <link href="{% static 'encyclopedia/sidebars.css' %}" rel="stylesheet">
     </head>
+
     <body>
-        <div class="row">
-            <div class="sidebar col-lg-2 col-md-3">
-                <h2>Wiki</h2>
-                <form action="{% url 'search' %}" method="post">
-                    {% csrf_token %}
-                    <input class="search" type="search" placeholder="Search Encyclopedia">
-                </form>
-                <div>
-                    <a href="{% url 'index' %}">Home</a>
-                </div>
-                <div>
+
+        <div class="d-flex flex-column p-3" style="width: 255px; height: 100vh; background-color: lightgrey;">
+            <img class="w-85 p-3" src="{% static 'encyclopedia/Wiki.png' %}" alt = "WIKI">
+            <a href="{% url 'index' %}" class="ms-5 d-flex align-items-center link-dark text-decoration-none">               
+                <b class="fs-4 ms-4 p-3 ">Wiki</b>
+            </a>
+            <form class="mb-3 mt-3" action="{% url 'search' %}" method="GET">
+                <input class="form-control form-control-sm" type="search" name="search_input" placeholder="Search Encyclopedia">
+            </form>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="{% url 'index' %}" class="nav-link link-dark select">
+                    Home
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'newpage' %}" class="nav-link link-dark select">
                     Create New Page
-                </div>
-                <div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'randompage' %}" class="nav-link link-dark select">
                     Random Page
+                    </a>
+                </li>
+            </ul>        
+        </div>
+
+        <div class="tab-content p-4" style="width: 80%;"> 
+            <div class="d-flex flex-row justify-content-between">
+                <div class="ps-4">
+                    {% block header %}
+                    {% endblock %}
                 </div>
-                {% block nav %}
-                {% endblock %}
+                <div class="pe-4 pt-2">
+                    {% block button %}
+                    {% endblock %}
+                </div>
             </div>
-            <div class="main col-lg-10 col-md-9">
+            <hr>
+            <div class="pt-2 ps-4 pe-4">
                 {% block body %}
                 {% endblock %}
             </div>
         </div>
+        
+        
 
+        <script src="{% static 'encyclopedia/bootstrap.bundle.min.js' %}"></script>
+
+        <script src="{% static 'encyclopedia/sidebars.js' %}"></script>
+    
     </body>
 </html>

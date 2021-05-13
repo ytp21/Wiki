@@ -1,0 +1,28 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Edit Page
+{% endblock %}
+
+{% block header %}
+    <h1>Editing Page "{{ title }}" </h1>
+{% endblock %}
+
+{% block body %}
+
+{% if entry_exist %}
+    <p class="alert alert-danger" role="alert">ERROR: A page with this edited title "{{ edited_title }}" is already exists.</p>
+{% endif %}
+
+{% if invalid %}
+    <p class="alert alert-warning" role="alert">ERROR: The data entered is invalid. Please try again.</p>
+{% endif %}
+
+    <form class="mb-3" action="{% url 'editpage' %}" method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <input type="hidden" name="origin" value={{ title }}>
+        <input class="btn btn-primary mt-4" type="submit" value="Submit">
+    </form>
+
+{% endblock %}

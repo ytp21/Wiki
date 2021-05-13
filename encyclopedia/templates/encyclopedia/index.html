@@ -1,18 +1,54 @@
 {% extends "encyclopedia/layout.html" %}
 
 {% block title %}
-    Encyclopedia
+    {% if encyclopedia %}
+        Encyclopedia
+    {% elif search %}
+        Search Result
+    {% endif %}
+{% endblock %}
+
+{% block header %}
+    {% if search_result %}
+    <h1>You've searched for "{{ value }}"...</h1>
+    {% elif search_ntg %}
+    <h1>You've searched for an empty string</h1>
+    {% elif search_noresult %}
+    <h1>Error finding page "{{ entry }}" </h1>
+    {% else %}
+    <h1>All Pages</h1>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
-    <h1>All Pages</h1>
+    {% if newentry_added %}
+        <p class="alert alert-success" role="alert">You have successfully added a new entry : <b>{{ newentry }}</b></p>
+    {% endif %}
+
+    {% if search_ntg %}
+        <p>Please try again by typing any character on the search bar.</p>
+    {% elif search_noresult %}
+        <p>Looks like the entry you've entered doesn't exist.</p>
+        <p>Click <a href="{% url 'newpage' %}">here</a> or "Create New Page" to add this new entry of yours.</p>
+    {% endif %}
+
+    {% if count is not None %}
+        {% if count == 0 %}
+            <p>No result found</p>
+            <p>Looks like your search doesn't exist.</p>
+            <p>Click <a href="{% url 'newpage' %}">here</a> or "Create New Page" to add this new entry of yours.</p>
+        {% elif count == 1 %}
+            <p>{{ count }} result found</p>
+        {% else %}
+            <p>{{ count }} results found</p>
+        {% endif %}
+    {% endif %}
 
     <ul>
         {% for entry in entries %}
             <li>
-                <a href="{% url 'entrypage' entryname=entry %}">{{ entry }}</a>
+                <a class="header-link" href="{% url 'entrypage' entryname=entry %}">{{ entry }}</a>
             </li>
         {% endfor %}
     </ul>
-
 {% endblock %}
