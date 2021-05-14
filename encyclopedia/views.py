@@ -18,35 +18,29 @@ class FormInput(forms.Form):
     content = forms.CharField(required=False, widget=forms.Textarea(attrs={"class":"form-control mt-1", "id":"exampleFormControlTextarea1", "rows":"8", "placeholder":"Enter the page content in word / using markdown syntax"}))
 
 def index(request):
-    if request.method == "GET":
-        msg_alert = request.GET.get("value","")
-        title_entry = request.GET.get("entry","")
-    else:
-        pass
-
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries(),
-        "newentry_added": msg_alert,
-        "newentry": title_entry,
         "count": None,
         "encyclopedia": True
     })
 
 def page(request, entryname):
+    modified_entryname = re.sub(r'(\[|\]|\.|\^|\$|\*|\+|\{|\}|\||\(|\))',r'\\\1', entryname)
     page = util.get_entry(entryname)
     if page is not None:
         entries = util.list_entries()
         for entry in entries:
-            result = re.match(entryname.upper(), entry.upper())
+            result = re.match(modified_entryname.upper(), entry.upper())
             if result:
                 final_entry = entry
                 break
             else:
                 pass
 
+        final_value = re.sub(r'(\[|\]|\.|\^|\$|\*|\+|\{|\}|\||\(|\))',r'\\\1', final_entry)            
         return render(request, "encyclopedia/entrypage.html", {
             "header": markdowner.convert(f"# {final_entry}"),
-            "entrycontext": markdowner.convert(re.sub(f"^# {final_entry}","", page)),
+            "entrycontext": markdowner.convert(re.sub(f"^# {final_value}","", page)),
             "title": final_entry
             })
 
@@ -58,20 +52,22 @@ def page(request, entryname):
 
 def search(request):
     value = request.GET.get("search_input","")
+    modified_value = re.sub(r'(\[|\]|\.|\^|\$|\*|\+|\{|\}|\||\(|\))',r'\\\1', value)
     value_content = util.get_entry(value)
     if value_content is not None:
         entries = util.list_entries()
         for entry in entries:
-            result = re.match(value.upper(), entry.upper())
+            result = re.match(modified_value.upper(), entry.upper())
             if result:
                 final_entry = entry
                 break
             else:
                 pass
 
+        final_value = re.sub(r'(\[|\]|\.|\^|\$|\*|\+|\{|\}|\||\(|\))',r'\\\1', final_entry)
         return render(request, "encyclopedia/entrypage.html", {
             "header": markdowner.convert(f"# {final_entry}"),
-            "entrycontext": markdowner.convert(re.sub(f"^# {final_entry}","", value_content)),
+            "entrycontext": markdowner.convert(re.sub(f"^# {final_value}","", value_content)),
             "title": final_entry
             })
 
@@ -83,9 +79,8 @@ def search(request):
     else:
         update_entry = []
         entries = util.list_entries()
-        modified_value = value.upper()
         for entry in entries:
-            result = re.match(f'^{modified_value}', entry.upper())
+            result = re.match(f'^{modified_value.upper()}', entry.upper())
             if result:
                 update_entry.append(entry)
             else:
@@ -130,7 +125,8 @@ def editPage(request):
     if request.POST.get("edit","") == "True":
         title = request.POST.get("title","")
         content = util.get_entry(title)
-        modified_content = re.sub(f"^# {title}(\n)*","", content)
+        modified_title = re.sub(r'(\[|\]|\.|\^|\$|\*|\+|\{|\}|\||\(|\))',r'\\\1', title)
+        modified_content = re.sub(f"^# {modified_title}(\n)*","", content)
         form = FormInput(initial={'title': title, 'content': modified_content})
         return render(request, "encyclopedia/editpage.html", {
             "form": form,
